@@ -11,5 +11,8 @@ export const config = cleanEnv(Deno.env.toObject(), {
     CHAT_ID: str(),
     DEV: bool(
       {default: dev}
-    )
+    ),
+    DENO_APP_NAME: str({
+      default: ''
+    })
   })

@@ -67,6 +67,10 @@ async function checkRSS() {
      }
 
         await new Promise(f => setTimeout(f, 20000))
+        if (config.DENO_APP_NAME && config.DENO_APP_NAME != ''){
+            await fetch(`${config.DENO_APP_NAME}.deno.dev`).then((r) => console.log(`KEEPALIVE pinged with status ${r.status}`)
+            )
+        }
   }}
 
 async function sendImage(image: string, caption: string){

@@ -1,4 +1,7 @@
-import { cleanEnv, num, str } from "./deps.ts"
+import { configAsync, cleanEnv, num, str, bool, parse } from "./deps.ts"
+
+let dev: boolean = parse(Deno.args).dev
+await configAsync({ export: dev })
 
 export const config = cleanEnv(Deno.env.toObject(), {
     PORT: num({
@@ -6,4 +9,7 @@ export const config = cleanEnv(Deno.env.toObject(), {
     }),
     BOT_TOKEN: str(),
     CHAT_ID: str(),
+    DEV: bool(
+      {default: dev}
+    )
   })

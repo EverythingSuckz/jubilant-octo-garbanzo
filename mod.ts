@@ -4,8 +4,6 @@ console.log("starting...")
 
 const startTime = Math.floor( Date.now() / 1000 )
 
-console.log(startTime)
-
 async function checkRSS() {
     await new Promise(f => setTimeout(f, 5000))
     console.log("RSS Job started")
@@ -19,17 +17,21 @@ async function checkRSS() {
           )
         const xml = await response.text()
         const feed = await rss.parseFeed(xml)
-        if (lastFeed) {
-            for (const post of feed.entries) {
-                if (post.title?.value === lastFeed){
-                    break
-                }
-                posts.push(post)
+        if (config.DEV){
+            posts.push(feed.entries[0])
+        } else 
+        {
+            if (lastFeed) {
+                for (const post of feed.entries) {
+                    if (post.title?.value === lastFeed){
+                        break
+                    }
+                        posts.push(post)
                 }
         } else {
             console.log("No last feed found. Posting everything")
             posts = feed.entries
-        }
+        }}
 
         if (posts) {
             for (const post of posts.reverse()) {
@@ -127,6 +129,11 @@ function timeFormat(seconds: number): string {
     return timeStr;
 }
 
-const aserve = () => new Promise((_, __) => setTimeout(() => serve((_: unknown) => Response.json(({"uptime": timeFormat(Math.floor( Date.now() / 1000 ) - startTime)}))), 1000))
+async function aserve(){
+    if (config.DEV){
+        console.log("**WARNING**: Development mode is turned ON")
+    }
+    await new Promise((_, __) => setTimeout(() => serve((_: unknown) => Response.json(({"uptime": timeFormat(Math.floor( Date.now() / 1000 ) - startTime), "prod": !config.DEV}))), 1000))
+}
 
 Promise.all([aserve(), checkRSS()])

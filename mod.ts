@@ -109,18 +109,24 @@ if (resp.status == 200){
 }
 }
 
-function TimeFormat(seconds: number): string {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const days = Math.floor(hours / 24);
+function timeFormat(seconds: number): string {
+    const final_secs = Math.floor(seconds % 60)
+    const minutes = Math.floor((seconds / 60) % 60)
+    const hours = Math.floor(seconds / (60 * 60))
+    const final_hours = hours % 24
+    const days = Math.floor(hours / 24)
     let timeStr = "";
-    if (days > 0) {
-        timeStr += `${days} days, `;
+    if (days === 1) {
+        timeStr += `${days} day, `
+    } else if (days > 1) {
+        timeStr += `${days} days, `
     }
-    timeStr += `${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+    timeStr += `${final_hours} hour${(final_hours > 1) ? "s" : ""}, `
+    timeStr += `${minutes} minute${(minutes > 1) ? "s" : ""} and `
+    timeStr += `${final_secs} second${(final_secs > 1) ? "s" : ""}.`
     return timeStr;
 }
 
-const aserve = () => new Promise((_, __) => setTimeout(() => serve((_: unknown) => new Response(JSON.stringify({"uptime": TimeFormat(Math.floor( Date.now() / 1000 ) - startTime)}))), 1000))
+const aserve = () => new Promise((_, __) => setTimeout(() => serve((_: unknown) => Response.json(({"uptime": timeFormat(Math.floor( Date.now() / 1000 ) - startTime)}))), 1000))
 
 Promise.all([aserve(), checkRSS()])
